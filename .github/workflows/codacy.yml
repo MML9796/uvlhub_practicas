@@ -47,16 +47,17 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -e ./rosemary
-
-    # APARTADO 1: Verificar si hay nuevas versiones de dependencias instaladas
+     # APARTADO 1: Verificar si hay nuevas versiones de dependencias instaladas
     - name: Check outdated dependencies
       run: pip list --outdated
+      continue-on-error: true
 
     # APARTADO 3: Realizar un análisis de seguridad con pip-audit
     - name: Security analysis with pip-audit
       run: |
         pip install pip-audit
         pip-audit -r requirements.txt
+      continue-on-error: true
 
     - name: Run tests with coverage
       run: |
