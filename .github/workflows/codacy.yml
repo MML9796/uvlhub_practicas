@@ -11,6 +11,11 @@ on:
 jobs:
   codacy:
     runs-on: ubuntu-24.04
+    # APARTADO 2: Configurar la matriz para probar en Python 3.13 y 3.14
+    strategy:
+      matrix:
+        python-version: ["3.13", "3.14"]
+        
     services:
       mariadb:
         image: mariadb:12.0.2
@@ -31,16 +36,27 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v5
 
-    - name: Set up Python
+    # APARTADO 2: Usar la variable de la matriz en lugar de una versión estática
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v6
       with:
-        python-version: '3.13'
+        python-version: ${{ matrix.python-version }}
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install -e ./rosemary
+
+    # APARTADO 1: Verificar si hay nuevas versiones de dependencias instaladas
+    - name: Check outdated dependencies
+      run: pip list --outdated
+
+    # APARTADO 3: Realizar un análisis de seguridad con pip-audit
+    - name: Security analysis with pip-audit
+      run: |
+        pip install pip-audit
+        pip-audit -r requirements.txt
 
     - name: Run tests with coverage
       run: |
