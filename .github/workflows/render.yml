@@ -1,17 +1,35 @@
 name: Deploy to Render
 
 on:
-    push:
-      branches:
-        - main
-    pull_request:
-      branches:
-        - main
+  # APARTADO 3: Se ejecutará cuando se cree un tag que empiece por 'v' (ej. v1.0.0)
+  push:
+    tags:
+      - 'v*'
+      
+  # APARTADO 1 (Parte A): Escuchar cuando un Pull Request hacia main se cierra
+  pull_request:
+    types: [closed]
+    branches:
+      - main
 
 jobs:
+  # APARTADO 2 (Parte A): Trabajo de pruebas que debe pasar antes de desplegar
+  test:
+    name: Run Tests
+    # APARTADO 1 (Parte B): Nos aseguramos de que si es un PR, haya sido MERGEADO y no solo cerrado
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v5
+        
+      - name: Simulador de pruebas (Sustituye por tus comandos reales si lo necesitas)
+        run: echo "Ejecutando pruebas... ¡Todo correcto!"
 
   deploy:
     name: Deploy to Render
+    # APARTADO 2 (Parte B): El despliegue depende (needs) obligatoriamente de que 'test' acabe con éxito
+    needs: test
     runs-on: ubuntu-24.04
     steps:
       - name: Check out the repo
